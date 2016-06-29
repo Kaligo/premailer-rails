@@ -6,8 +6,7 @@ class Premailer
 
         def load(url)
           if asset_pipeline_present?
-            file = file_name(url)
-            asset = ::Rails.application.assets.find_asset(file)
+            asset = find_asset(url)
             asset.to_s if asset
           end
         end
@@ -17,6 +16,14 @@ class Premailer
             ::Rails.respond_to?(:application) &&
             ::Rails.application.respond_to?(:assets) &&
             ::Rails.application.assets
+        end
+
+        def find_asset(url)
+          if ::Rails.configuration.assets.compile
+            url
+          else
+            ::Rails.application.assets_manifest.assets[file_name(url)]
+          end
         end
 
         def file_name(url)
